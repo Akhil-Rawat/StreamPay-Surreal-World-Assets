@@ -2,6 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Zap, Globe, CheckCircle } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import {
+  PushUniversalWalletProvider,
+  PushUniversalAccountButton,
+  PushUI,
+} from "@pushchain/ui-kit";
 import { useWallet } from '../hooks/useWallet';
 
 export const Landing: React.FC = () => {
@@ -66,19 +71,11 @@ export const Landing: React.FC = () => {
               </Button>
             </Link>
           </div>
-
-          {!isConnected && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
-              <p className="text-sm text-blue-800 mb-3">Connect your wallet to get started</p>
-              <Button
-                onClick={connectWallet}
-                variant="secondary"
-                size="sm"
-              >
-                Connect Wallet
-              </Button>
-            </div>
-          )}
+          <div className='flex justify-center'>
+          <div className="p-4 border-b">
+            <PushUniversalAccountButton />
+          </div>
+        </div>
         </div>
       </section>
 

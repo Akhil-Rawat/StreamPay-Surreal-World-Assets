@@ -10,11 +10,29 @@ import { Wallet } from "./pages/Wallet";
 import { Subscriptions } from "./pages/Subscriptions";
 import SubscriptionTracker from "./components/SubscriptionTracker";
 import { TestPage } from "./pages/TestPage";
+import {
+  PushUniversalWalletProvider,
+  PushUniversalAccountButton,
+  PushUI,
+} from "@pushchain/ui-kit";
 
 function App() {
+  const walletConfig = {
+    network: PushUI.CONSTANTS.PUSH_NETWORK.TESTNET,
+    login: {
+      email: false,
+      google: false,
+      wallet: {
+        enabled: true,
+      },
+      appPreview: false,
+    },
+  };
+
   return (
-    <Router>
-      <Layout>
+    <PushUniversalWalletProvider config={walletConfig}>
+      <Router>
+        <Layout>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/provider/onboarding" element={<ProviderOnboarding />} />
@@ -51,6 +69,7 @@ function App() {
         />
       </Layout>
     </Router>
+    </PushUniversalWalletProvider>
   );
 }
 
