@@ -43,12 +43,14 @@ Imagine if your Spotify subscription wasn't just access to music, but actual own
 ### 🏃‍♂️ Try It Right Now
 
 ```bash
-git clone https://github.com/Vipul-045/StreamPay-arbitrum
-cd StreamPay-arbitrum
+git clone https://github.com/Akhil-Rawat/StreamPay-Surreal-World-Assets.git
+cd StreamPay-Surreal-World-Assets
 npm install
 npm run dev
 # Open http://localhost:5173/ip-registration and see the magic ✨
 ```
+
+![Quick Setup](https://img.shields.io/badge/Setup-5%20minutes-brightgreen?style=for-the-badge)
 
 ---
 
