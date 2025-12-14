@@ -1,9 +1,9 @@
 # StreamPay - Turning Subscriptions into Intellectual Property 💡
 
-## 🚀 Live on Story Protocol Devnet
+## 🚀 Live on Arbitrum
 
-**Contract Address**: `FPZJ1WxDRcoipvNSSxFhUys8kqCgKMZ5R81x1REyhCRa`  
-**Network**: Story Protocol Devnet
+**Contract Address**: `0xe65365Ea1cfb28dafD5fF6246a2E2A124A13093B`  
+**Network**: Arbitrum Chain
 
 ---
 
