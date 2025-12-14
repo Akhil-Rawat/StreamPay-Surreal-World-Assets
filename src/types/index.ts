@@ -9,6 +9,11 @@ export interface Plan {
   isActive: boolean;
   subscriberCount: number;
   createdAt: string;
+  // Story Protocol IP Integration
+  ipAssetId?: string;
+  ipMetadataURI?: string;
+  hasLicense?: boolean;
+  licenseTermsId?: string;
 }
 
 export interface Provider {
@@ -17,6 +22,9 @@ export interface Provider {
   email: string;
   walletAddress: string;
   createdAt: string;
+  // Story Protocol IP Integration
+  totalIPAssets?: number;
+  totalRoyaltiesEarned?: string;
 }
 
 export interface Subscription {
@@ -29,6 +37,10 @@ export interface Subscription {
   status: 'active' | 'cancelled' | 'expired';
   nextPaymentDate: string;
   subscribedAt: string;
+  // Story Protocol IP Integration
+  licenseTokenId?: string;
+  hasLicense?: boolean;
+  contentIPAssetId?: string; // If user created derivative content
 }
 
 export interface EscrowBalance {
@@ -44,4 +56,6 @@ export interface PaymentHistory {
   date: string;
   status: 'success' | 'failed' | 'pending';
   txHash?: string;
+  // Story Protocol IP Integration
+  royaltyAmount?: string; // Portion that went to IP royalties
 }

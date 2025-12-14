@@ -18,6 +18,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: "My Subscriptions", href: "/subscriptions" },
     { name: "Wallet", href: "/wallet" },
     { name: "Provider Dashboard", href: "/provider" },
+    { name: "IP Registration", href: "/ip-registration" },
     { name: "Test Page", href: "/test" },
   ];
 

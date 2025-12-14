@@ -10,6 +10,7 @@ import { Wallet } from "./pages/Wallet";
 import { Subscriptions } from "./pages/Subscriptions";
 import SubscriptionTracker from "./components/SubscriptionTracker";
 import { TestPage } from "./pages/TestPage";
+import { IPRegistrationPage } from "./pages/IPRegistration";
 import {
   PushUniversalWalletProvider,
   PushUniversalAccountButton,
@@ -42,6 +43,7 @@ function App() {
           <Route path="/subscriptions" element={<Subscriptions />} />
           <Route path="/tracker" element={<SubscriptionTracker />} />
           <Route path="/test" element={<TestPage />} />
+          <Route path="/ip-registration" element={<IPRegistrationPage />} />
         </Routes>
         <Toaster
           position="top-right"

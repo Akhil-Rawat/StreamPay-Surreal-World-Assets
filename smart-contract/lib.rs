@@ -24,6 +24,13 @@ sol! {
     event ProviderEarnings(address indexed provider, uint256 indexed planId, uint256 amount);
     event EscrowDeposit(address indexed user, uint256 amount, uint256 newBalance);
     event EscrowWithdrawal(address indexed user, uint256 amount, uint256 newBalance);
+    
+    // Story Protocol IP Integration Events
+    event IPAssetRegistered(uint256 indexed planId, address indexed ipAsset, string metadataURI);
+    event IPLicenseAttached(address indexed ipAsset, uint256 indexed licenseTermsId);
+    event IPLicenseMinted(address indexed ipAsset, address indexed licensee, uint256 indexed tokenId);
+    event IPRoyaltyPaid(address indexed ipAsset, address indexed recipient, uint256 amount);
+    event ContentIPRegistered(uint256 indexed subscriptionId, address indexed contentCreator, address indexed ipAsset);
 }
 
 #[derive(SolidityError)]
@@ -55,6 +62,13 @@ sol_storage! {
         mapping(uint256 => bool) subscription_active;
         
         mapping(address => uint256) user_escrow_balance;
+        
+        // Story Protocol IP Integration Storage
+        mapping(uint256 => address) plan_ip_asset;
+        mapping(uint256 => string) plan_metadata_uri;
+        mapping(address => uint256) ip_asset_royalty_balance;
+        mapping(uint256 => address) subscription_content_ip;
+        mapping(address => bool) ip_license_holders;
     }
 }
 
@@ -321,5 +335,138 @@ impl SubscriptionEscrow {
             return Err(SubscriptionError::Unauthorized(Unauthorized {}));
         }
         Ok(())
+    }
+    
+    // Story Protocol IP Integration Functions
+    
+    /// Register an IP asset for a subscription plan
+    /// Links the plan to Story Protocol's IP registry
+    pub fn register_plan_ip_asset(&mut self, plan_id: U256, ip_asset_address: Address, metadata_uri: String) -> Result<bool, SubscriptionError> {
+        let caller = self.vm().msg_sender();
+        let plan_provider = self.plan_provider.get(plan_id);
+        
+        // Only the plan provider can register the IP asset
+        if plan_provider != caller {
+            return Err(SubscriptionError::Unauthorized(Unauthorized {}));
+        }
+        
+        if ip_asset_address == Address::ZERO {
+            return Err(SubscriptionError::InvalidInput(InvalidInput {}));
+        }
+        
+        self.plan_ip_asset.insert(plan_id, ip_asset_address);
+        self.plan_metadata_uri.insert(plan_id, metadata_uri.clone());
+        
+        evm::log(IPAssetRegistered {
+            planId: plan_id,
+            ipAsset: ip_asset_address,
+            metadataURI: metadata_uri
+        });
+        
+        Ok(true)
+    }
+    
+    /// Record IP license attachment
+    pub fn record_license_attachment(&mut self, ip_asset: Address, license_terms_id: U256) -> Result<bool, SubscriptionError> {
+        if ip_asset == Address::ZERO {
+            return Err(SubscriptionError::InvalidInput(InvalidInput {}));
+        }
+        
+        evm::log(IPLicenseAttached {
+            ipAsset: ip_asset,
+            licenseTermsId: license_terms_id
+        });
+        
+        Ok(true)
+    }
+    
+    /// Record IP license mint for subscriber
+    pub fn record_license_mint(&mut self, ip_asset: Address, licensee: Address, token_id: U256) -> Result<bool, SubscriptionError> {
+        if ip_asset == Address::ZERO || licensee == Address::ZERO {
+            return Err(SubscriptionError::InvalidInput(InvalidInput {}));
+        }
+        
+        self.ip_license_holders.insert(licensee, true);
+        
+        evm::log(IPLicenseMinted {
+            ipAsset: ip_asset,
+            licensee: licensee,
+            tokenId: token_id
+        });
+        
+        Ok(true)
+    }
+    
+    /// Distribute IP royalties to creators
+    /// This implements the IPFi track - programmable royalty distribution
+    pub fn distribute_ip_royalty(&mut self, ip_asset: Address, recipient: Address, amount: U256) -> Result<bool, SubscriptionError> {
+        let caller = self.vm().msg_sender();
+        
+        // Only admin can trigger royalty distribution (can be extended to automated oracles)
+        if caller != self.admin.get() {
+            return Err(SubscriptionError::Unauthorized(Unauthorized {}));
+        }
+        
+        if amount.is_zero() || recipient == Address::ZERO {
+            return Err(SubscriptionError::InvalidInput(InvalidInput {}));
+        }
+        
+        let current_royalty_balance = self.ip_asset_royalty_balance.get(ip_asset);
+        let new_balance = current_royalty_balance + amount;
+        self.ip_asset_royalty_balance.insert(ip_asset, new_balance);
+        
+        evm::log(IPRoyaltyPaid {
+            ipAsset: ip_asset,
+            recipient: recipient,
+            amount: amount
+        });
+        
+        Ok(true)
+    }
+    
+    /// Register content IP created by subscribers using the service
+    /// This creates IP lineage and derivative relationships
+    pub fn register_content_ip(&mut self, subscription_id: U256, content_ip_asset: Address) -> Result<bool, SubscriptionError> {
+        let caller = self.vm().msg_sender();
+        let subscriber = self.subscription_subscriber.get(subscription_id);
+        
+        // Only the subscriber can register their content IP
+        if subscriber != caller {
+            return Err(SubscriptionError::Unauthorized(Unauthorized {}));
+        }
+        
+        if !self.subscription_active.get(subscription_id) {
+            return Err(SubscriptionError::InvalidInput(InvalidInput {}));
+        }
+        
+        self.subscription_content_ip.insert(subscription_id, content_ip_asset);
+        
+        evm::log(ContentIPRegistered {
+            subscriptionId: subscription_id,
+            contentCreator: caller,
+            ipAsset: content_ip_asset
+        });
+        
+        Ok(true)
+    }
+    
+    /// Get IP asset associated with a plan
+    pub fn get_plan_ip_asset(&self, plan_id: U256) -> Address {
+        self.plan_ip_asset.get(plan_id)
+    }
+    
+    /// Get IP metadata URI for a plan
+    pub fn get_plan_metadata_uri(&self, plan_id: U256) -> String {
+        self.plan_metadata_uri.get(plan_id)
+    }
+    
+    /// Get total royalties accumulated for an IP asset
+    pub fn get_ip_royalty_balance(&self, ip_asset: Address) -> U256 {
+        self.ip_asset_royalty_balance.get(ip_asset)
+    }
+    
+    /// Check if address holds a valid IP license
+    pub fn has_ip_license(&self, holder: Address) -> bool {
+        self.ip_license_holders.get(holder)
     }
 }
