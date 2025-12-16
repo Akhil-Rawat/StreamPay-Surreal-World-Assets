@@ -1,10 +1,10 @@
 # StreamPay - Turning Subscriptions into Intellectual Property 💡
 
 ## Quick Description ##  
- StreamPay reimagines Web3 subscriptions as on-chain intellectual property using Story Protocol.
+**StreamPay reimagines Web3 subscriptions as on-chain intellectual property using Story Protocol.
 Each subscription becomes a licensed IP NFT with programmable rights, derivative tracking, and automatic royalty splits.
 Creators monetize fairly, subscribers get provable licenses, and developers integrate seamlessly via plug-and-play SDKs.
-Subscriptions that pay, protect, and propagate IP—by default. 
+Subscriptions that pay, protect, and propagate IP—by default.**
 
 ## 🚀 Live on Arbitrum
 
